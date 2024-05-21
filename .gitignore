@@ -32,3 +32,7 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+
+# Vault Raft storage
+raft/*
+!raft/.gitkeep
