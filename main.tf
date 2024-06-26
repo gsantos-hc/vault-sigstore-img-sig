@@ -22,11 +22,32 @@ module "vault_transit" {
   }
 }
 
+# Sigstore Policy Controller ---------------------------------------------------
+module "policy_controller" {
+  source        = "./modules/policy-controller"
+  namespace     = "sigstore"
+  opt_in        = true # Minimize impact of policy enforcement by opting in namespaces
+  opt_in_label  = local.sigstore_opt_in_label
+  opt_out_label = local.sigstore_opt_out_label
+
+  # Test deployment of Harbor registry uses self-signed certificate
+  registry_ca_certs = try([module.harbor[0].tls_cert], null)
+}
+
 # Optional: Harbor Registry ----------------------------------------------------
 # Default username and password for Harbor is "admin" and "Harbor12345"
 module "harbor" {
   count        = var.deploy_harbor ? 1 : 0
   source       = "./modules/harbor"
-  namespace    = "harbor"
   external_url = "harbor.harbor.svc"
+  namespace    = "harbor"
+  namespace_labels = {
+    "${local.sigstore_opt_out_label}" = true
+  }
+}
+
+# Locals -----------------------------------------------------------------------
+locals {
+  sigstore_opt_in_label  = "policy.sigstore.dev/include"
+  sigstore_opt_out_label = "policy.sigstore.dev/exclude"
 }
