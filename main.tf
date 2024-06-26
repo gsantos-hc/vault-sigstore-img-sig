@@ -1,3 +1,14 @@
+# Provider Configs -------------------------------------------------------------
+provider "kubernetes" {
+  config_path = "~/.kube/config"
+}
+
+provider "helm" {
+  kubernetes {
+    config_path = "~/.kube/config"
+  }
+}
+
 # Vault Transit ----------------------------------------------------------------
 module "vault_transit" {
   source     = "./modules/vault_transit"
@@ -9,4 +20,13 @@ module "vault_transit" {
       ]
     }
   }
+}
+
+# Optional: Harbor Registry ----------------------------------------------------
+# Default username and password for Harbor is "admin" and "Harbor12345"
+module "harbor" {
+  count        = var.deploy_harbor ? 1 : 0
+  source       = "./modules/harbor"
+  namespace    = "harbor"
+  external_url = "harbor.harbor.svc"
 }
