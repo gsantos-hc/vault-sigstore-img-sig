@@ -11,7 +11,7 @@ provider "helm" {
 
 # Vault Transit ----------------------------------------------------------------
 module "vault_transit" {
-  source     = "./modules/vault_transit"
+  source     = "./modules/vault-transit"
   team_names = ["app-team-a", "app-team-b"]
   team_members = {
     app-team-a = {
