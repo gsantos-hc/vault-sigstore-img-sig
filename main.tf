@@ -50,6 +50,19 @@ module "image_policies" {
   ]
 }
 
+# Test Namespace & Deployment --------------------------------------------------
+module "test_deployment" {
+  source           = "./modules/test-deployment"
+  namespace        = "test-deployment"
+  namespace_labels = { "${local.sigstore_opt_in_label}" = true }
+  deployment_name  = "test"
+  image            = "${local.registry_prefix}/${var.image_name}@${var.image_digest}"
+
+  depends_on = [
+    module.image_policies,
+  ]
+}
+
 # Optional: Harbor Registry ----------------------------------------------------
 # Default username and password for Harbor is "admin" and "Harbor12345"
 module "harbor" {
