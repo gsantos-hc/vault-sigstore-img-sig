@@ -25,13 +25,29 @@ module "vault_transit" {
 # Sigstore Policy Controller ---------------------------------------------------
 module "policy_controller" {
   source        = "./modules/policy-controller"
-  namespace     = "sigstore"
+  namespace     = local.sigstore_namespace
   opt_in        = true # Minimize impact of policy enforcement by opting in namespaces
   opt_in_label  = local.sigstore_opt_in_label
   opt_out_label = local.sigstore_opt_out_label
 
   # Test deployment of Harbor registry uses self-signed certificate
   registry_ca_certs = try([module.harbor[0].tls_cert], null)
+}
+
+# Cluster Image Policies -------------------------------------------------------
+module "image_policies" {
+  source    = "./modules/image-policies"
+  namespace = local.sigstore_namespace
+  image_signers = {
+    for team, key_name in module.vault_transit.key_names : team => {
+      image_pattern  = "${local.registry_prefix}/${team}/**"
+      key_identifier = "hashivault://${key_name}"
+    }
+  }
+
+  depends_on = [
+    module.policy_controller,
+  ]
 }
 
 # Optional: Harbor Registry ----------------------------------------------------
@@ -48,6 +64,10 @@ module "harbor" {
 
 # Locals -----------------------------------------------------------------------
 locals {
+  # Adjust this to your environment
+  registry_prefix = try(module.harbor[0].internal_url, "docker.io")
+
+  sigstore_namespace     = "sigstore"
   sigstore_opt_in_label  = "policy.sigstore.dev/include"
   sigstore_opt_out_label = "policy.sigstore.dev/exclude"
 }
