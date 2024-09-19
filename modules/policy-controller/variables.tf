@@ -5,9 +5,11 @@ variable "namespace" {
 }
 
 variable "chart_version" {
+  # Note: Please use a version later than 0.7.0, as custom pod annotations are
+  # needed to support Vault Agent Injector
   description = "Sigstore Policy Controller Helm chart version"
   type        = string
-  default     = "0.6.8"
+  default     = "0.7.0"
 }
 
 variable "opt_in" {
@@ -43,4 +45,30 @@ variable "no_match_policy" {
     condition     = contains(["warn", "allow", "deny"], var.no_match_policy)
     error_message = "Policy must be one of 'warn', 'allow', or 'deny'."
   }
+}
+
+variable "vault_addr" {
+  description = "Address of the Vault cluster"
+  type        = string
+}
+
+variable "vault_auth_namespace" {
+  description = "Vault Namespace in which the Kubernetes auth method is mounted (Enterprise only)"
+  type        = string
+  default     = ""
+}
+
+variable "vault_auth_mount" {
+  description = "Path to where the Kubernetes authentication method is mounted"
+  type        = string
+}
+
+variable "vault_auth_role" {
+  description = "Name of the role to use for authenticating in Vault"
+  type        = string
+}
+
+variable "vault_transit_path" {
+  description = "Path where the Transit engine is mounted in Vault"
+  type        = string
 }

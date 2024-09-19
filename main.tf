@@ -30,6 +30,12 @@ module "policy_controller" {
   opt_in_label  = local.sigstore_opt_in_label
   opt_out_label = local.sigstore_opt_out_label
 
+  # Authentication to Vault - Customize to fit your environment
+  vault_addr         = "http://vault.vault.svc:8200"
+  vault_auth_mount   = "auth/kubernetes"
+  vault_auth_role    = "sigstore-policy-controller"
+  vault_transit_path = module.vault_transit.mount_path
+
   # Test deployment of Harbor registry uses self-signed certificate
   registry_ca_certs = try([module.harbor[0].tls_cert], null)
 }
