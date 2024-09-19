@@ -58,6 +58,8 @@ module "image_policies" {
 
 # Test Namespace & Deployment --------------------------------------------------
 module "test_deployment" {
+  count = var.image_digest != null ? 1 : 0
+
   source           = "./modules/test-deployment"
   namespace        = "test-deployment"
   namespace_labels = { "${local.sigstore_opt_in_label}" = true }

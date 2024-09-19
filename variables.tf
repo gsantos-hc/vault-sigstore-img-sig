@@ -7,6 +7,7 @@ variable "image_name" {
 variable "image_digest" {
   description = "SHA256 digest of the test container image (prefixed with sha256:)"
   type        = string
+  default     = null
 }
 
 variable "deploy_harbor" {
